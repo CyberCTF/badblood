@@ -1,0 +1,17 @@
+{
+  "title": "BadBlood",
+  "description": "A single Windows Server 2019 domain controller for badblood.local, filled by BadBlood with a tiered OU structure and thousands of random users, groups, computers, SPNs and ACLs, different on every build: a realistic, noisy domain to map and climb.",
+  "question": "Find an attack path in badblood.local and reach Domain Admin.",
+  "category": "NETWORK",
+  "difficulty": 3,
+  "evidence_kind": "SECRET",
+  "capabilities": ["active-directory", "bloodhound", "acl-abuse", "kerberoasting"],
+  "providers": [
+    "virtualbox",
+    "vmware_desktop",
+    "parallels",
+    "vmware_esxi",
+    "aws",
+    "azure"
+  ]
+}

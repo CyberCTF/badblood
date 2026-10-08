@@ -1,0 +1,60 @@
+# Builds the BadBlood lab on dc01, from the controller: promote a new forest (badblood.local),
+# then run upstream's Invoke-BadBlood.ps1 unchanged, non-interactively, with its default sizes
+# (2500 users, 500 groups, 100 computers) and its LAPS schema step.
+- name: BadBlood domain controller
+  hosts: dc
+  gather_facts: false
+  vars:
+    domain: badblood.local
+    netbios: BADBLOOD
+    # The domain's built-in Administrator (and the DSRM password). Promotion needs one set.
+    admin_password: "B4dBl00d!Forest#2023"
+  tasks:
+    - name: Local Administrator password (becomes the domain Administrator's)
+      ansible.windows.win_user:
+        name: Administrator
+        password: "{{ admin_password }}"
+        password_never_expires: true
+
+    - name: AD DS role
+      ansible.windows.win_feature:
+        name: AD-Domain-Services
+        include_management_tools: true
+
+    - name: New forest {{ domain }}
+      microsoft.ad.domain:
+        dns_domain_name: "{{ domain }}"
+        domain_netbios_name: "{{ netbios }}"
+        safe_mode_password: "{{ admin_password }}"
+        reboot: true
+
+    - name: Wait for Active Directory Web Services
+      ansible.windows.win_shell: Get-ADDomain | Select-Object -ExpandProperty DNSRoot
+      register: addomain
+      until: addomain.rc == 0 and domain in addomain.stdout
+      retries: 30
+      delay: 20
+
+    - name: Upstream scripts
+      ansible.windows.win_copy:
+        src: ../BadBlood/
+        dest: C:\BadBlood\
+
+    # BadBlood needs Domain Admin and Schema Admin rights (its LAPS step extends the schema).
+    # The provisioning account is a domain administrator after promotion but not a Schema
+    # Admin; it joins Schema Admins here (each task is a new logon, so the next one has it).
+    - name: Provisioning account in Schema Admins
+      microsoft.ad.group:
+        identity: Schema Admins
+        members:
+          add: [vagrant]
+
+    # Long: about 20 minutes.
+    - name: Invoke-BadBlood
+      ansible.windows.win_shell: |
+        C:\BadBlood\Invoke-BadBlood.ps1 -NonInteractive
+        New-Item -ItemType File -Force C:\BadBlood\done | Out-Null
+      args:
+        creates: C:\BadBlood\done
+      async: 10800
+      poll: 30

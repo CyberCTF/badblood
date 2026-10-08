@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=https://www.isoloom.com/schema/v1.json
+# BadBlood (by David Rowe, Secframe): one Windows Server 2019 domain controller for
+# badblood.local, filled by upstream's PowerShell with a tiered OU structure and thousands of
+# random users, groups, computers, SPNs and ACLs, different on every build. Source:
+# https://github.com/davidprowe/BadBlood, vendored in BadBlood/. Built by provision/main.yml
+# from a controller Isoloom adds. VM targets only. `isoloom run vagrant`, then `isoloom test vagrant`.
+version: 1
+name: badblood
+
+networks:
+  lab: { cidr: 10.60.82.0/24 }
+
+machines:
+  dc01:
+    networks: { lab: 10 }
+    services:
+      - { port: 53, name: dns }
+      - { port: 88, name: kerberos }
+      - { port: 135, name: rpc }
+      - { port: 389, name: ldap }
+      - { port: 445, name: smb }
+      - { port: 5985, name: winrm }
+    resources: { cpus: 2, memory_mb: 4096 }
+    vm:
+      os: windows-server-2019
+
+provision:
+  - ansible: provision/main.yml
+    requirements: provision/requirements.yml
+    groups:
+      dc: [dc01]
+
+checks:
+  - { name: dns answers, tcp: "dc01:53", wait: 300 }
+  - { name: kerberos answers, tcp: "dc01:88" }
+  - { name: ldap answers, tcp: "dc01:389" }
+  - { name: smb answers, tcp: "dc01:445" }
+  - checks/badblood-objects.sh
+
+message: |
+  BadBlood is up: dc01, the domain controller of badblood.local, at {{ machines.dc01.addresses.lab }}.
+  Thousands of random users, groups and ACLs, different on every build: collect the domain
+  (BloodHound) and find a path to Domain Admin.
