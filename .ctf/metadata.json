@@ -5,7 +5,6 @@
   "category": "NETWORK",
   "difficulty": 3,
   "evidence_kind": "SECRET",
-  "capabilities": ["active-directory", "bloodhound", "acl-abuse", "kerberoasting"],
   "providers": [
     "virtualbox",
     "vmware_desktop",
