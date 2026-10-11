@@ -1,0 +1,65 @@
+{
+  "objectives": [
+    {
+      "key": "main",
+      "title": "Domain Admin",
+      "prompt": "Find an attack path in badblood.local, reach Domain Admin and read C:\\ctf\\flag.txt on dc01.",
+      "check": {
+        "evidence": "SECRET",
+        "format": "FLAG{%s}"
+      },
+      "dev": "FLAG{dev-badblood}",
+      "hints": [
+        "The domain is huge and random: collect it with a graph tool and ask for shortest paths to Domain Admins.",
+        "Accounts with an SPN or with pre-authentication disabled are common starting points.",
+        "Read the edges: GenericAll, WriteDacl, ForceChangePassword and group memberships are all steps on a path."
+      ],
+      "steps": [
+        {
+          "key": "domain",
+          "title": "Name the domain",
+          "prompt": "What is the DNS name of the Active Directory domain?",
+          "check": {
+            "answer": [
+              "badblood.local"
+            ]
+          }
+        },
+        {
+          "key": "graph",
+          "title": "Map the domain",
+          "prompt": "Which open-source tool turns collected AD data into a graph of attack paths?",
+          "check": {
+            "answer": [
+              "bloodhound",
+              "bloodhound ce",
+              "bloodhound community edition"
+            ]
+          }
+        },
+        {
+          "key": "roast",
+          "title": "Roast a service",
+          "prompt": "Which attack requests Kerberos service tickets for accounts that have an SPN, then cracks them offline?",
+          "check": {
+            "answer": [
+              "kerberoasting",
+              "kerberoast"
+            ]
+          }
+        },
+        {
+          "key": "acl",
+          "title": "Read an edge",
+          "prompt": "Which AD permission gives full control over an object, so it can reset a user's password or change a group's members? (BloodHound edge name)",
+          "check": {
+            "answer": [
+              "genericall",
+              "generic all"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

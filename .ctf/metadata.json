@@ -1,7 +1,7 @@
 {
   "title": "BadBlood",
   "description": "A single Windows Server 2019 domain controller for badblood.local, filled by BadBlood with a tiered OU structure and thousands of random users, groups, computers, SPNs and ACLs, different on every build: a realistic, noisy domain to map and climb.",
-  "question": "Find an attack path in badblood.local and reach Domain Admin.",
+  "question": "Find an attack path in badblood.local, reach Domain Admin and read C:\\ctf\\flag.txt on dc01.",
   "category": "NETWORK",
   "difficulty": 3,
   "evidence_kind": "SECRET",

@@ -7,6 +7,9 @@
 version: 1
 name: badblood
 
+# Given by the CyberCTF launcher: this player's flag. Without it the development flag.
+inputs: [CTF_FLAG_MAIN]
+
 networks:
   lab: { cidr: 10.60.82.0/24 }
 
@@ -21,8 +24,12 @@ machines:
       - { port: 445, name: smb }
       - { port: 5985, name: winrm }
     resources: { cpus: 2, memory_mb: 4096 }
+    inputs: [CTF_FLAG_MAIN]
     vm:
       os: windows-server-2019
+      # The player's flag in C:\ctf\flag.txt, before the playbook: readable by Administrators
+      # and SYSTEM only, which on a domain controller means Domain Admin.
+      provision: [provision/flag.ps1]
 
 provision:
   - ansible: provision/main.yml
@@ -41,3 +48,4 @@ message: |
   BadBlood is up: dc01, the domain controller of badblood.local, at {{ machines.dc01.addresses.lab }}.
   Thousands of random users, groups and ACLs, different on every build: collect the domain
   (BloodHound) and find a path to Domain Admin.
+  Domain Admin reads the flag in C:\ctf\flag.txt on dc01.

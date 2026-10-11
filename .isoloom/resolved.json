@@ -3,7 +3,9 @@
   "resolved_version": 1,
   "name": "badblood",
   "instance": null,
-  "inputs": [],
+  "inputs": [
+    "CTF_FLAG_MAIN"
+  ],
   "networks": {
     "lab": {
       "cidr": "10.60.82.0/24",
@@ -71,7 +73,9 @@
         }
       ],
       "depends_on": [],
-      "inputs": [],
+      "inputs": [
+        "CTF_FLAG_MAIN"
+      ],
       "volumes": {},
       "resources": {
         "cpus": 2,
@@ -173,5 +177,5 @@
       }
     ]
   },
-  "message": "BadBlood is up: dc01, the domain controller of badblood.local, at 10.60.82.10.\nThousands of random users, groups and ACLs, different on every build: collect the domain\n(BloodHound) and find a path to Domain Admin.\n"
+  "message": "BadBlood is up: dc01, the domain controller of badblood.local, at 10.60.82.10.\nThousands of random users, groups and ACLs, different on every build: collect the domain\n(BloodHound) and find a path to Domain Admin.\nDomain Admin reads the flag in C:\\ctf\\flag.txt on dc01.\n"
 }
